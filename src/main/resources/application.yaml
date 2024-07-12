@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///db_test?TC_DAEMON=true
+  sql:
+    init:
+      mode: always
