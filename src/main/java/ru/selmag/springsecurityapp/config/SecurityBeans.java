@@ -3,12 +3,13 @@ package ru.selmag.springsecurityapp.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.session.DisableEncodeUrlFilter;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
@@ -22,12 +23,14 @@ public class SecurityBeans {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .httpBasic(httpBasic -> {
-                })
-                .authorizeHttpRequests(authorizeHttpRequests ->
-                        authorizeHttpRequests.anyRequest().authenticated())
-                .build();
+        http
+                .addFilterBefore(new AccessDeniedCURLFilter(), DisableEncodeUrlFilter.class)
+                .httpBasic(Customizer.withDefaults())
+                .authorizeHttpRequests(authorizeHttpdRequest ->
+                        authorizeHttpdRequest.requestMatchers("/error").permitAll()
+                                .anyRequest().authenticated());
+
+        return http.build();
     }
 
     @Bean
